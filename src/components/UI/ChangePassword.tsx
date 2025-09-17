@@ -2,6 +2,10 @@ import Link from "next/link";
 import Image from "../Image";
 import Input from "./Input";
 import Form from "./Form";
+import {
+  ChangePasswordAction,
+  ChangePasswordDataType,
+} from "@/actions/ChangePassword";
 
 const SignUp = () => {
   return (
@@ -29,21 +33,34 @@ const SignUp = () => {
           <h2 className="font-bold text-2xl py-4 text-black ">
             Change password
           </h2>
-          <Form
-            submitAction={() => {}}
+          <Form<ChangePasswordDataType>
+            submitAction={ChangePasswordAction}
             href="/"
             buttonText="    Change password"
           >
             {({ register, formState: { errors } }) => {
               return (
                 <>
-                  <Input name="email" placeholder="Email" className="mt-4" />
                   <Input
+                    register={register}
+                    errors={errors}
+                    type="email"
+                    name="email"
+                    placeholder="Email"
+                    className="mt-4"
+                  />
+                  <Input
+                    register={register}
+                    errors={errors}
+                    type="password"
                     name="oldPassword"
                     placeholder="Old password"
                     className="mt-4"
                   />
                   <Input
+                    register={register}
+                    errors={errors}
+                    type="password"
                     name="newPassword"
                     placeholder="New password"
                     className="mt-4"

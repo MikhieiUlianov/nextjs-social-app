@@ -1,8 +1,8 @@
 import Link from "next/link";
 import Image from "../Image";
 import Input from "./Input";
-import Button from "./Button";
 import Form from "./Form";
+import { SignUpAction } from "@/actions/SignUp";
 
 const SignUp = () => {
   return (
@@ -29,19 +29,39 @@ const SignUp = () => {
         <h2 className="font-bold text-2xl py-4 text-black ">
           Create your account
         </h2>
-        <Form submitAction={() => {}} href="/" buttonText="Sign up">
+        <Form submitAction={SignUpAction} href="/" buttonText="Sign up">
           {({ register, formState: { errors } }) => {
             return (
               <>
-                <Input name="name" placeholder="Name" className="mt-4" />
-                <Input name="email" placeholder="Email" className="mt-4" />
                 <Input
+                  register={register}
+                  errors={errors}
+                  type="text"
+                  name="name"
+                  placeholder="Name"
+                  className="mt-4"
+                />
+                <Input
+                  register={register}
+                  errors={errors}
+                  type="email"
+                  name="email"
+                  placeholder="Email"
+                  className="mt-4"
+                />
+                <Input
+                  register={register}
+                  errors={errors}
+                  type="password"
                   name="password"
                   placeholder="Password"
                   className="mt-4"
                 />
                 <Input
-                  name="verifyPassword"
+                  register={register}
+                  errors={errors}
+                  type="password"
+                  name="confirmPassword"
                   placeholder="Verify password"
                   className="mt-4"
                 />

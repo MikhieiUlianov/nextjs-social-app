@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "../Image";
 import Input from "./Input";
 import Form from "./Form";
+import { SignInAction, SignInDataType } from "@/actions/SignIn";
 
 const SignIn = () => {
   return (
@@ -27,12 +28,30 @@ const SignIn = () => {
       <div>
         <div className="flex flex-col ">
           <h2 className="font-bold text-2xl py-4 text-black ">Sign in</h2>
-          <Form submitAction={() => {}} href="/" buttonText="Sign in">
+          <Form<SignInDataType>
+            submitAction={SignInAction}
+            href="/"
+            buttonText="Sign in"
+          >
             {({ register, formState: { errors } }) => {
               return (
                 <>
-                  <Input name="name" placeholder="Name" className="mt-4" />
-                  <Input name="email" placeholder="Email" className="mt-4" />
+                  <Input
+                    register={register}
+                    errors={errors}
+                    type="password"
+                    name="password"
+                    placeholder="Password"
+                    className="mt-4"
+                  />
+                  <Input
+                    register={register}
+                    errors={errors}
+                    type="email"
+                    name="email"
+                    placeholder="Email"
+                    className="mt-4"
+                  />
                 </>
               );
             }}

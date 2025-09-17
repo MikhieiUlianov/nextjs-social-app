@@ -8,10 +8,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
 model User {
-  id          String   @id
+  id          String   @id @default(cuid())
   email       String   @unique
-  username    String   @unique
+  username    String  
+  password    String
   displayName String?
   bio         String?
   location    String?
@@ -29,8 +31,19 @@ model User {
 
   saves SavedPosts[]
 
+  sessions  Session[]
+
   followers  Follow[] @relation("UserFollowers")
   followings Follow[] @relation("UserFollowings")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model Post {
