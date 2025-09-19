@@ -1,8 +1,19 @@
 import Feed from "@/components/Feed";
 import Share from "@/components/Share";
+import { prisma } from "@/prisma";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 
-const Homepage = () => {
+const Homepage = async ({
+  params,
+}: {
+  params: Promise<{ username: string }>;
+}) => {
+  const user = await prisma.user.findFirst({
+    where: { username: (await params).username },
+  });
+  if (!user) return notFound();
+
   return (
     <div className="">
       <div className="px-4 pt-4 flex justify-between text-textGray font-bold border-b-[1px] border-borderGray">
@@ -26,7 +37,7 @@ const Homepage = () => {
         </Link>
       </div>
       <Share />
-      <Feed />
+      <Feed userProfileId={user.id} />
     </div>
   );
 };

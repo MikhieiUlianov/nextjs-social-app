@@ -1,7 +1,5 @@
-import LeftBar from "@/components/LeftBar";
+import QueryProvider from "@/providers/QueryProvider";
 import "./globals.css";
-import RightBar from "@/components/RightBar";
-
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -15,8 +13,10 @@ export default function AppLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body>{children}</body>
-    </html>
+    <QueryProvider>
+      <html lang="en">
+        <body>{children}</body>
+      </html>
+    </QueryProvider>
   );
 }
