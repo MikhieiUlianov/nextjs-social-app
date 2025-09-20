@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,11 +7,10 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
   id          String   @id @default(cuid())
   email       String   @unique
-  username    String  
+  username    String
   password    String
   displayName String?
   bio         String?
@@ -26,12 +24,12 @@ model User {
 
   // RELATIONS
   posts Post[]
-
+  //Like[], Post[]... are like links
   likes Like[]
 
   saves SavedPosts[]
 
-  sessions  Session[]
+  sessions Session[]
 
   followers  Follow[] @relation("UserFollowers")
   followings Follow[] @relation("UserFollowings")
@@ -62,6 +60,7 @@ model Post {
 
   rePostId Int?
   rePost   Post?  @relation("RePosts", fields: [rePostId], references: [id])
+  //обратная
   rePosts  Post[] @relation("RePosts")
 
   parentPostId Int?
