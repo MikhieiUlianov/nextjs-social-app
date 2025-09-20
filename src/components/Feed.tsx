@@ -41,6 +41,7 @@ const Feed = async ({ userProfileId }: { userProfileId?: string }) => {
     skip: 0,
     orderBy: { createdAt: "desc" },
   });
+  console.log("feed", posts);
   return (
     <div>
       {posts.map((post) => (
