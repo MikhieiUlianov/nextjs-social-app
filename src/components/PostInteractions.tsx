@@ -1,7 +1,9 @@
 "use client";
 
 import { likePost, rePostPost, savePost } from "@/actions";
-import { useOptimistic, useState } from "react";
+import { socket } from "@/socket";
+import { User } from "lucia";
+import { useEffect, useOptimistic, useState } from "react";
 
 const PostInteractions = ({
   username,
@@ -25,45 +27,20 @@ const PostInteractions = ({
     isRePosted,
     isSaved,
   });
+  const [user, setUser] = useState<User>();
 
-  const likeAction = async () => {
-    addOptimisticCount("like");
+  // ✅ Fetch user once
+  useEffect(() => {
+    const fetchUser = async () => {
+      const res = await fetch("http://localhost:3000/api/user");
+      if (!res.ok) throw new Error("User not found");
+      const parsedUser: User = await res.json();
+      setUser(parsedUser);
+    };
+    fetchUser();
+  }, []);
 
-    await likePost(postId);
-    setState((prev) => {
-      return {
-        ...prev,
-        likes: prev.isLiked ? prev.likes - 1 : prev.likes + 1,
-        isLiked: !prev.isLiked,
-      };
-    });
-  };
-
-  const rePostAction = async () => {
-    addOptimisticCount("rePost");
-
-    await rePostPost(postId);
-    setState((prev) => {
-      return {
-        ...prev,
-        rePosts: prev.isRePosted ? prev.rePosts - 1 : prev.rePosts + 1,
-        isRePosted: !prev.isRePosted,
-      };
-    });
-  };
-
-  const saveAction = async () => {
-    addOptimisticCount("save");
-
-    await savePost(postId);
-    setState((prev) => {
-      return {
-        ...prev,
-        isSaved: !prev.isSaved,
-      };
-    });
-  };
-
+  // ✅ Hooks always run before conditional rendering
   const [optimisticCount, addOptimisticCount] = useOptimistic(
     state,
     (prev, type: "like" | "rePost" | "save") => {
@@ -90,6 +67,58 @@ const PostInteractions = ({
       return prev;
     }
   );
+
+  if (!user) return null;
+
+  // --- Actions ---
+  const likeAction = async () => {
+    if (!optimisticCount.isLiked) {
+      socket.emit("sendNotification", {
+        receiverUsername: username,
+        data: {
+          senderUsername: user.username,
+          type: "Like",
+          link: `/${username}/status/${postId}`,
+        },
+      });
+    }
+    addOptimisticCount("like");
+    await likePost(postId);
+    setState((prev) => ({
+      ...prev,
+      likes: prev.isLiked ? prev.likes - 1 : prev.likes + 1,
+      isLiked: !prev.isLiked,
+    }));
+  };
+
+  const rePostAction = async () => {
+    if (!optimisticCount.isRePosted) {
+      socket.emit("sendNotification", {
+        receiverUsername: username,
+        data: {
+          senderUsername: user.username,
+          type: "rePost",
+          link: `/${username}/status/${postId}`,
+        },
+      });
+    }
+    addOptimisticCount("rePost");
+    await rePostPost(postId);
+    setState((prev) => ({
+      ...prev,
+      rePosts: prev.isRePosted ? prev.rePosts - 1 : prev.rePosts + 1,
+      isRePosted: !prev.isRePosted,
+    }));
+  };
+
+  const saveAction = async () => {
+    addOptimisticCount("save");
+    await savePost(postId);
+    setState((prev) => ({
+      ...prev,
+      isSaved: !prev.isSaved,
+    }));
+  };
 
   return (
     <div className="flex items-center justify-between gap-4 lg:gap-16 my-2 text-textGray">

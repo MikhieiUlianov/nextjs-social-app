@@ -5,28 +5,24 @@ import Link from "next/link";
 import { Post as PostType } from "@prisma/client";
 import { format } from "timeago.js";
 
-type PostWithDetails = PostType & {
-  user: {
-    displayName: string | null;
-    username: string;
-    img: string | null;
-  };
-  rePost?: PostType & {
-    user: {
-      displayName: string | null;
-      username: string;
-      img: string | null;
-    };
-    likes: { id: number }[];
-    rePosts: { id: number }[];
-    saves: { id: number }[];
-    _count: { likes: number; rePosts: number; comments: number };
-  };
+type UserSummary = {
+  displayName: string | null;
+  username: string;
+  img: string | null;
+};
+
+type Engagement = {
   likes: { id: number }[];
   rePosts: { id: number }[];
   saves: { id: number }[];
   _count: { likes: number; rePosts: number; comments: number };
 };
+
+type PostWithDetails = PostType &
+  Engagement & {
+    user: UserSummary;
+    rePost?: (PostType & Engagement & { user: UserSummary }) | null;
+  };
 const Post = ({
   type,
   post,
@@ -77,7 +73,7 @@ const Post = ({
               <div
                 className={`${
                   type !== "status" && "hidden"
-                } relative w-10 h-10 rounded-full overflow-hidden`}
+                } relative w-10 h-10 rounded-full overflow-hidden -z-10`}
               >
                 <Image
                   path={originalPost.user.img || "general/noAvatar.png"}
