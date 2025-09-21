@@ -7,6 +7,26 @@ import { getUser } from "./utils/getUser";
 import { revalidatePath } from "next/cache";
 import { UploadResponse } from "imagekit/dist/libs/interfaces";
 
+export const followUser = async (targetUserId: string) => {
+  const { user } = await getUser();
+
+  if (!user) throw new Error("Registration is required to make this action.");
+
+  const existingFollow = await prisma.follow.findFirst({
+    where: { followerId: user.id, followingId: targetUserId },
+  });
+
+  if (existingFollow) {
+    await prisma.follow.delete({
+      where: { id: existingFollow.id },
+    });
+  } else {
+    await prisma.follow.create({
+      data: { followerId: user.id, followingId: targetUserId },
+    });
+  }
+};
+
 export const likePost = async (postId: number) => {
   const { user } = await getUser();
 

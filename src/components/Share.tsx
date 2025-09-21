@@ -5,13 +5,11 @@ import Image from "./Image";
 import NextImage from "next/image";
 import ImageEditor from "./ImageEditor";
 import { addPost } from "@/actions";
-import { getUser } from "@/utils/getUser";
 import { User } from "@prisma/client";
 
-const Share = () => {
+const Share = ({ user }: { user: User }) => {
   const [media, setMedia] = useState<File | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
-  const [user, setUser] = useState<User | null>();
   const [settings, setSettings] = useState<{
     type: "original" | "wide" | "square";
     sensitive: boolean;
@@ -27,14 +25,6 @@ const Share = () => {
   };
 
   const previewURL = media ? URL.createObjectURL(media) : null;
-
-  useEffect(() => {
-    const getUserData = async () => {
-      const { user } = await getUser();
-      if (!user) throw new Error("User not found");
-      setUser(user);
-    };
-  }, []);
 
   const [state, formAction, isPending] = useActionState(addPost, {
     success: false,

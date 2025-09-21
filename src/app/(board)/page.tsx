@@ -1,6 +1,7 @@
 import Feed from "@/components/Feed";
 import Share from "@/components/Share";
 import { prisma } from "@/prisma";
+import { getUser } from "@/utils/getUser";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -13,6 +14,9 @@ const Homepage = async ({
     where: { username: (await params).username },
   });
   if (!user) return notFound();
+
+  const { user: luciaUser } = await getUser();
+  if (!luciaUser) throw new Error("User not found");
 
   return (
     <div className="">
@@ -36,7 +40,7 @@ const Homepage = async ({
           CSS
         </Link>
       </div>
-      <Share />
+      <Share user={luciaUser} />
       <Feed userProfileId={user.id} />
     </div>
   );
