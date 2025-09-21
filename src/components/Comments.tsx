@@ -4,7 +4,8 @@ import { getUser } from "@/utils/getUser";
 import Image from "./Image";
 import Post from "./Post";
 import { Post as PostType } from "@prisma/client";
-import { prisma } from "@/prisma";
+import { useActionState } from "react";
+import { addComment } from "@/actions";
 
 type CommentWithDetails = PostType & {
   user: { displayName: string | null; username: string; img: string | null };
@@ -26,11 +27,18 @@ const Comments = async ({
   const { user } = await getUser();
 
   if (!user) throw new Error("No user found.");
+  const [state, formAction, isPending] = useActionState(addComment, {
+    success: false,
+    error: false,
+  });
 
   return (
-    <div className="">
+    <div>
       {user && (
-        <form className="flex items-center justify-between gap-4 p-4 ">
+        <form
+          action={formAction}
+          className="flex items-center justify-between gap-4 p-4 "
+        >
           <div className="relative w-10 h-10 rounded-full overflow-hidden">
             <Image
               path={user.img || "general/noAvatar.png"}
@@ -41,13 +49,28 @@ const Comments = async ({
             />
           </div>
           <input
+            name="desc"
             type="text"
             className="flex-1 bg-transparent outline-none p-2 text-xl"
             placeholder="Post your reply"
           />
-          <button className="py-2 px-4 font-bold bg-white text-black rounded-full">
-            Reply
+          <input name="postId" type="number" hidden readOnly value={postId} />
+          <input
+            name="username"
+            type="string"
+            hidden
+            readOnly
+            value={username}
+          />
+          <button
+            disabled={isPending}
+            className="py-2 px-4 font-bold bg-white text-black rounded-full disabled:cursor-not-allowed disabled:bg-slate-200"
+          >
+            {isPending ? "Replying" : "Reply"}
           </button>
+          {state.error && (
+            <span className="text-red-300 p-4">Something went wrong.</span>
+          )}
         </form>
       )}
       {comments.map((comment) => (

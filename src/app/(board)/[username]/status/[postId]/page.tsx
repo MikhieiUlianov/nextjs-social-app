@@ -26,9 +26,9 @@ const StatusPage = async ({
       likes: { where: { userId: user.id }, select: { id: true } },
       saves: { where: { userId: user.id }, select: { id: true } },
       comments: {
+        orderBy: { createdAt: "desc" },
         include: {
           user: { select: { displayName: true, username: true, img: true } },
-
           rePosts: { where: { userId: user.id }, select: { id: true } },
           _count: { select: { likes: true, rePosts: true, comments: true } },
           likes: { where: { userId: user.id }, select: { id: true } },
